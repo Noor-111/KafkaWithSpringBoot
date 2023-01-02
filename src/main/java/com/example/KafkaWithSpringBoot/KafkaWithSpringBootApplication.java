@@ -102,13 +102,18 @@ class Processor {
 
 		// Kstreams joins test
 		KStream<String, String> userRegions = builder.stream("streams-test1-input-topic-1", Consumed.with(Serdes.String(), Serdes.String()));
-		KStream<String, Long> regionMetrics = builder.stream("streams-test1-input-topic-2", Consumed.with(Serdes.String(), Serdes.Long()));
+//		KStream<String, Long> regionMetrics = builder.stream("streams-test1-input-topic-2", Consumed.with(Serdes.String(), Serdes.Long()));
+		KStream<String, String> regionMetrics = builder.stream("streams-test1-input-topic-2", Consumed.with(Serdes.String(), Serdes.String()));
 
-		regionMetrics.join(userRegions,
+
+
+		KStream<String,String> out = regionMetrics.join(userRegions,
 				(regionValue, metricValue) -> regionValue + "/" + metricValue,
 				JoinWindows.of(Duration.ofMinutes(5L)),
-				StreamJoined.with(Serdes.String(), Serdes.Long(), Serdes.String())
-		).to("streams-test1-output-topic-1");
+				StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
+		);
+		out.print(Printed.toSysOut());
+		out.to("streams-test1-output-topic-1");
 
 
 	}
