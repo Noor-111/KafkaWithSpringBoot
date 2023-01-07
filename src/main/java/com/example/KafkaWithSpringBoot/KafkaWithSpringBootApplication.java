@@ -1,5 +1,6 @@
 package com.example.KafkaWithSpringBoot;
 
+import com.example.KafkaWithSpringBoot.serdes.SerdesFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -125,9 +126,9 @@ class Processor {
 //		out.print(Printed.toSysOut());
 //		out.to("streams-test1-output-topic-1");
 //		int count = 10;
-		final Serde<JsonNode> jsonSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
-		final Serde<ArrayNode> arrayNodeSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
-		final Serde<ObjectNode> objectNodeSerde = Serdes.serdeFrom(new JsonSerializer(), new JsonDeserializer());
+		final Serde<JsonNode> jsonSerde = SerdesFactory.jsonNodeSerde();//Serdes.serdeFrom(new JsonSerializer<JsonNode>(), new JsonDeserializer<JsonNode>());
+		final Serde<ArrayNode> arrayNodeSerde = Serdes.serdeFrom(new JsonSerializer<ArrayNode>(), new JsonDeserializer<ArrayNode>());
+		final Serde<ObjectNode> objectNodeSerde = SerdesFactory.objectNodeSerde();//Serdes.serdeFrom(new JsonSerializer<ObjectNode>(), new JsonDeserializer<ObjectNode>());
 
 		final KTable<String,ObjectNode> employerTable =
 				builder.stream("EMPLOYER",Consumed.with(Serdes.String(),objectNodeSerde)).toTable();
