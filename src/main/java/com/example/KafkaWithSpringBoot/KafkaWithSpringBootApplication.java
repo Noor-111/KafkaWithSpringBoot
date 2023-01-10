@@ -165,7 +165,8 @@ class Processor {
 								.withKeySerde(stringSerde)
 								.withValueSerde(objectNodeSerde)
 
-				);
+				).filter((k,v)-> isAggregateComplete(v));//completeness condition
+//						(v.get("employees") == v.get("count").asInt());//completeness condition
 
 		resultKTable.
 				toStream()
@@ -227,6 +228,32 @@ class Processor {
 //                        );
 
 
+	}
+
+	/**
+	 *
+	 * @param v
+	 * @return
+	 * Checks for the completeness condition
+	 * The JSON node is considered complete if the "employees" array field has the
+	 * number of elements same as the value of "count" field
+	 */
+	private static boolean isAggregateComplete(ObjectNode v) {
+		if(v == null)
+			return false;
+
+		int count =0;
+		int requiredNo = v.get("count").asInt();
+		JsonNode nodeArray = v.get("employees");
+		if(nodeArray.isArray()){
+			for (JsonNode node: nodeArray) {
+				count++;
+			}
+		}
+
+		if(count == requiredNo )
+			return true;
+		return false;
 	}
 
 }
